@@ -21,10 +21,10 @@ app.get('/', (req: Request, res: Response) => {
     return res.send('Hello');
 });
 
-queue.process("queue example", (job: Job, done: DoneCallback) => {
+queue.process("queue example", (job: Job, done: DoneCallback) => {    
     axios
-        .get("https://my-json-server.typicode.com/minhnhat2904/job-queue/db" + job.data.list)
-        .then(result => {
+        .get("https://my-json-server.typicode.com/minhnhat2904/job-queue/list/" + job.data.data)
+        .then(result => {            
             console.log(result.data);
             setTimeout(() => {
                 done();
