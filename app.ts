@@ -9,7 +9,7 @@ const port = 3000;
 const queue = kue.createQueue();
 
 app.get('/', (req: Request, res: Response) => {
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i < 3; i++) {
         queue
             .create("queue example", {
                 title: "This testing request",
@@ -23,7 +23,7 @@ app.get('/', (req: Request, res: Response) => {
 
 queue.process("queue example", (job: Job, done: DoneCallback) => {
     axios
-        .get("https://jsonplaceholder.typicode.com/todos/" + job.data.data)
+        .get("https://my-json-server.typicode.com/minhnhat2904/job-queue/db" + job.data.list)
         .then(result => {
             console.log(result.data);
             setTimeout(() => {
