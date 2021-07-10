@@ -1,16 +1,18 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const transporter =  nodemailer.createTransport({ // config mail server
     service: 'Gmail',
     auth: {
-        user: 'phancaominhnhat29@gmail.com',
-        pass: 'minhnhat2904:)'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
 export var mailOptions = { // thiết lập đối tượng, nội dung gửi mail
     from: 'Team BE SGroup supercup',
-    to: 'huyviet2582000@gmail.com',
+    to: '',
     subject: 'QUEUE AND BACKGROUND JOB',
     text: 'You recieved message from me',
     html: 

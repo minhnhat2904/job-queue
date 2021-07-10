@@ -23,44 +23,39 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 // create jobs
-app.get('/sendmail', (req: Request, res: Response) => { 
-    for(let i = 1; i < 13; i++){
-        queue.createJob('send-email',{
-            data: i
+app.get('/sendmail', async (req: Request, res: Response) => { 
+    const emailList = await axios.get("https://my-json-server.typicode.com/minhnhat2904/job-queue/list/");
+    const emailAddressList = emailList.data.map((email: any) => email.emailAddress);
+
+    emailAddressList.forEach((emailAddress: any) => { 
+        queue.createJob('send-email', {
+            emailAddress
         })
         .priority("high") // default is 'normal'
-        .ttl(60000) // Time To Live: default 2000ms
+        .ttl(5000) // Time To Live: default 2000ms
         .attempts(3) // default is 1
         .save();
-    }
-    return res.send('Sending email...');
+    })
+    
+    return res.send(`Sending to ${emailList.data.length} email...`);
 });
 
 // processing send mail under background
 queue.process("send-email", (job: Job, done: DoneCallback) => {  
-    console.log("worker run");
-    axios
-        .get("https://my-json-server.typicode.com/minhnhat2904/job-queue/list/" + job.data.data)
-        .then(result => {
-            let t0 = performance.now();            
-            mailOptions.to = result.data.gmail;
-            transporter.sendMail(mailOptions, function(err:any, info: any){
-                if (err) {
-                    console.log(err);
-                    done(err);
-                } else {
-                    console.log('Message sent to ' + result.data.gmail);
-                    setTimeout(() => {
-                        done();
-                    }, 2000); 
-                }
-                let t1 = performance.now();
-                console.log(`send email to ${result.data.gmail} took ${(t1 - t0)} milliseconds.`)
-            });
-        })
-        .catch(err => {
+    let emailAddress = job.data.emailAddress;
+    console.log(`start worker sent email to ${emailAddress}`);
+    let startTime = performance.now();   
+    
+    mailOptions.to = emailAddress;
+    transporter.sendMail(mailOptions, function(err:any, info: any){
+        if (err) {
+            console.log(`Gửi tới email ni fail rồi bro: ${emailAddress}, err: ${err}`);
             done(err);
-        });
+        } else {
+            console.log(`sent email to ${emailAddress} took ${(performance.now() - startTime)} milliseconds.`)
+            done();
+        }
+    });
 });
 
 app.use("/kue-api/", kue.app);
