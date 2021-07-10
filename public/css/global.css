@@ -1,0 +1,17 @@
+div{
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+    border-radius: 50%;
+    margin: 200px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: white;
+    font-size: 25px;
+}
+a{
+    text-decoration: none;
+    color: white;
+}

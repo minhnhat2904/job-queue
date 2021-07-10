@@ -3,8 +3,8 @@ import nodemailer from 'nodemailer';
 export const transporter =  nodemailer.createTransport({ // config mail server
     service: 'Gmail',
     auth: {
-        user: 'huyviet2582000@gmail.com',
-        pass: 'huyviet2582000@gmailcom'
+        user: 'phancaominhnhat29@gmail.com',
+        pass: 'minhnhat2904:)'
     }
 });
 
