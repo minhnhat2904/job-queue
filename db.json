@@ -2,11 +2,13 @@
   "list": [
     {
       "id": 1,
-      "emailAddress": "huyviet2582000@gmail.com"
+      "emailAddress": "huyviet2582000@gmail.com",
+      "priority": "low"
     },
     {
       "id": 2,
-      "emailAddress": "huyviet2182000@gmail.com"
+      "emailAddress": "huyviet2182000@gmail.com",
+      "priority": "critical"
     }
   ]
 }
