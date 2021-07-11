@@ -20,9 +20,19 @@ app.use(express.static(PUBLIC_PATH));
 
 app.get('/', (req: Request, res: Response) => {
     return res.render('home.pug');
-})
+});
 
-// let emailAddressListX = ['huyviet2182000@gmail.com', 'huyviet2582000@gmail.com'];
+// let emailList = [
+//     {
+//         emailAddress: "huyviet2582000@gmail.com",
+//         "priority": "low"
+//       },
+//       {
+//         emailAddress: "huyviet2182000@gmail.com",
+//         priority: "critical"
+//       }
+// ]
+
 // create jobs
 app.get('/sendmail', async (req: Request, res: Response) => { 
     const emailList = await axios.get("https://my-json-server.typicode.com/minhnhat2904/job-queue/list/");
@@ -34,19 +44,18 @@ app.get('/sendmail', async (req: Request, res: Response) => {
             emailAddress
         })
         .priority(priority) // default is 'normal'
-        .ttl(3000) // Time To Live
+        .ttl(1000) // Time To Live
         .attempts(5) // default is 1
         .save();
-
     });
     
     return res.send(`Sending to ${emailList.data.length} email...`);
 });
 
 // processing send mail under background
-queue.process("send-email", (job: Job, done: DoneCallback) => {  
+queue.process("send-email", 2, (job: Job, done: DoneCallback) => {  
     let emailAddress = job.data.emailAddress;
-    console.log(`>>>    start worker sent email to ${emailAddress}`);
+    console.log(`>>>    start worker sent email to ${emailAddress} with workerId: ${job.workerId}`);
     let startTime = performance.now();   
     
     mailOptions.to = emailAddress;
@@ -62,7 +71,7 @@ queue.process("send-email", (job: Job, done: DoneCallback) => {
 });
 
 queue.on('job enqueue', (id, type) => {
-    console.log('Job %s got queued', id);
+    console.log(`Job ${id} got queued`);
 });
 
 // A job get removed
@@ -73,12 +82,12 @@ queue.on('job complete', (id, result) => {
         job.remove((err: any) => {
             if (err)
                 console.log(`Job ${job.id} removed before or some error happened`);
-            console.log('Removed completed job #%d', job.id);
+            console.log(`<<<    Removed completed jobID: ${job.id} with workerId: ${job.workerId}`);
         });
     });
 });
 
-app.use("/kue-api/", kue.app);
+app.use("/kue-api/", kue.app); 
 
 app.listen(port, () => {
     console.log("Listening on port " + port);

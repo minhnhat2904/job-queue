@@ -17,7 +17,7 @@ export var mailOptions = { // thiết lập đối tượng, nội dung gửi ma
     text: 'You recieved message from me',
     html: 
     `<div>
-        <div><img src='https://res.cloudinary.com/ddqzgiilu/image/upload/v1625922959/123530478_367219177883513_9062475103320185042_n_fz9ce0.jpg'></img></div>
+        <div><img src='https://res.cloudinary.com/ddqzgiilu/image/upload/v1625981996/179546573_476241690296811_7153108016670037673_n_yzy2kd.jpg'></img></div>
         <h2>You are very lucky</h2>
         <p style='color: red; font-size: 24px'>Why you receive this email?</p>
         <p>Because you are in our black list, we will hack your facebook in next 2 days</p>
