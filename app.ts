@@ -22,20 +22,23 @@ app.get('/', (req: Request, res: Response) => {
     return res.render('home.pug');
 })
 
+// let emailAddressListX = ['huyviet2182000@gmail.com', 'huyviet2582000@gmail.com'];
 // create jobs
 app.get('/sendmail', async (req: Request, res: Response) => { 
     const emailList = await axios.get("https://my-json-server.typicode.com/minhnhat2904/job-queue/list/");
-    const emailAddressList = emailList.data.map((email: any) => email.emailAddress);
 
-    emailAddressList.forEach((emailAddress: any) => { 
+    emailList.data.forEach((email: any) => {
+        let {emailAddress, priority} = email;
+
         queue.createJob('send-email', {
             emailAddress
         })
-        .priority("high") // default is 'normal'
-        .ttl(5000) // Time To Live: default 2000ms
-        .attempts(3) // default is 1
+        .priority(priority) // default is 'normal'
+        .ttl(3000) // Time To Live
+        .attempts(5) // default is 1
         .save();
-    })
+
+    });
     
     return res.send(`Sending to ${emailList.data.length} email...`);
 });
@@ -43,7 +46,7 @@ app.get('/sendmail', async (req: Request, res: Response) => {
 // processing send mail under background
 queue.process("send-email", (job: Job, done: DoneCallback) => {  
     let emailAddress = job.data.emailAddress;
-    console.log(`start worker sent email to ${emailAddress}`);
+    console.log(`>>>    start worker sent email to ${emailAddress}`);
     let startTime = performance.now();   
     
     mailOptions.to = emailAddress;
@@ -55,6 +58,23 @@ queue.process("send-email", (job: Job, done: DoneCallback) => {
             console.log(`sent email to ${emailAddress} took ${(performance.now() - startTime)} milliseconds.`)
             done();
         }
+    });
+});
+
+queue.on('job enqueue', (id, type) => {
+    console.log('Job %s got queued', id);
+});
+
+// A job get removed
+queue.on('job complete', (id, result) => {
+    kue.Job.get(id, (err: any, job: any) => {
+        if (err)
+            return;
+        job.remove((err: any) => {
+            if (err)
+                console.log(`Job ${job.id} removed before or some error happened`);
+            console.log('Removed completed job #%d', job.id);
+        });
     });
 });
 
